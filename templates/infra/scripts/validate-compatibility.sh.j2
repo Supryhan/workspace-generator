@@ -1,0 +1,73 @@
+#!/bin/bash
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+INFRA_DIR="$(dirname "$SCRIPT_DIR")"
+
+cd "$INFRA_DIR"
+
+ENV_NAME="${1:-SIT}"
+MANIFEST="versions/$ENV_NAME.yaml"
+
+if [ ! -f "$MANIFEST" ]; then
+  echo "Error: Manifest file '$MANIFEST' not found."
+  echo "Available manifests:"
+  ls -1 versions/*.yaml | xargs -n 1 basename
+  exit 1
+fi
+
+echo "Validating workspace compatibility for environment: $ENV_NAME..."
+echo "Reading manifest: $MANIFEST"
+echo "--------------------------------------------------------"
+
+# Use inline python to cleanly parse YAML and validate actual component versions
+python3 - <<EOF
+import sys
+import os
+import yaml
+
+manifest_path = "$MANIFEST"
+with open(manifest_path, 'r') as f:
+    data = yaml.safe_load(f)
+
+workspace_name = data.get('workspace')
+env = data.get('environment')
+components = data.get('components', {})
+
+print(f"Workspace: {workspace_name} | Target Environment: {env}")
+print("-" * 56)
+
+all_ok = True
+for name, info in components.items():
+    repo = info.get('repository')
+    expected_ver = info.get('version')
+    
+    # Check component directory relative to infra root
+    repo_path = os.path.join("..", repo)
+    version_file = os.path.join(repo_path, "VERSION")
+    
+    if not os.path.exists(repo_path):
+        print(f"❌ Component '{name}': Repository directory '../{repo}' is missing.")
+        all_ok = False
+        continue
+        
+    if not os.path.exists(version_file):
+        print(f"❌ Component '{name}': '../{repo}/VERSION' file is missing.")
+        all_ok = False
+        continue
+        
+    with open(version_file, 'r') as vf:
+        actual_ver = vf.read().strip()
+        
+    if actual_ver == expected_ver:
+        print(f"✅ Component '{name}': version {actual_ver} matches.")
+    else:
+        print(f"❌ Component '{name}': version mismatch! Expected: {expected_ver}, Found: {actual_ver}")
+        all_ok = False
+
+print("-" * 56)
+if all_ok:
+    print("SUCCESS: All component versions align perfectly!")
+    sys.exit(0)
+else:
+    print("FAILURE: Version compatibility violations detected.")
+    sys.exit(1)
+EOF

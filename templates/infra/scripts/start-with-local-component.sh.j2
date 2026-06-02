@@ -1,0 +1,56 @@
+#!/bin/bash
+set -e
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+INFRA_DIR="$(dirname "$SCRIPT_DIR")"
+
+if [ -z "$1" ]; then
+  echo "Error: Please specify the component to debug locally."
+  echo "Usage: ./scripts/start-with-local-component.sh <component-name>"
+  exit 1
+fi
+
+COMPONENT="$1"
+VALID=false
+
+# Validate component name against config blueprint
+{% for component in components -%}
+if [ "$COMPONENT" = "{{ component.name }}" ]; then
+  VALID=true
+  PORT="{{ component.port or '' }}"
+fi
+{% endfor %}
+
+if [ "$VALID" = false ]; then
+  echo "Error: '$COMPONENT' is not a valid component of this workspace."
+  echo "Available components:"
+  {% for component in components -%}
+  echo "  - {{ component.name }}"
+  {% endfor -%}
+  exit 1
+fi
+
+cd "$INFRA_DIR"
+
+echo "Creating Compose Local Override to scale down '$COMPONENT'..."
+
+# Write the override compose file dynamically
+cat <<EOF > compose/compose.local.override.yml
+version: '3.8'
+services:
+  $COMPONENT:
+    scale: 0
+EOF
+
+echo "Starting workspace with '$COMPONENT' scaled to 0 in Docker..."
+docker compose -f compose/compose.local.yml -f compose/compose.local.override.yml --profile all up -d
+
+echo "========================================================================"
+echo "SUCCESS: Compose dependencies started successfully."
+echo "Component '$COMPONENT' is scaled down in Docker Compose."
+echo "You can now run '$COMPONENT' locally in your IDE in debug mode."
+if [ ! -z "$PORT" ]; then
+  echo "Make sure it binds locally to port: $PORT"
+  echo "Other container services can route traffic to it via: host.docker.internal:$PORT"
+fi
+echo "========================================================================"

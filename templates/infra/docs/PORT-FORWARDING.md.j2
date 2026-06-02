@@ -1,0 +1,44 @@
+# Port-Forwarding and Tunneling - {{ workspace.display_name }}
+
+This guide documents the hybrid local development workflow where a local component connects directly to remote dependencies (e.g. databases, queues) hosted in DEV/SIT Kubernetes clusters or cloud networks.
+
+---
+
+## State & Runtime Directory
+
+The port forwarding scripts manage background tunnel state cleanly using an ignored runtime directory:
+- State location: **`.runtime/port-forwarding/`** (This directory is explicitly added to `.gitignore` to prevent tracking runtime state).
+- Tunnel files: Stored as `.pid` files containing the system process IDs of active tunnels.
+
+---
+
+## Command Controls
+
+### 1. Initialize Tunnels
+Spin up background tunnels to remote cloud resources for the selected environment (defaults to `DEV`):
+```bash
+./scripts/start-port-forwarding.sh DEV
+```
+This runs the mapping scripts, saves active tunnel PIDs into `.runtime/port-forwarding/`, and prepares local ports.
+
+### 2. Check Tunnel Health
+List the status of active tunnels:
+```bash
+./scripts/status-port-forwarding.sh
+```
+
+### 3. Terminate Tunnels
+Shutdown background processes and clean up the runtime directory:
+```bash
+./scripts/stop-port-forwarding.sh
+```
+
+---
+
+## Scaling to Kubernetes
+
+In the first version, these scripts output mock state handles. In future milestones, replace mock commands inside `./scripts/start-port-forwarding.sh` with actual network bindings, e.g.:
+```bash
+kubectl port-forward svc/students-service 8081:8081 -n dev & echo $! > .runtime/port-forwarding/students-service.pid
+```
+This keeps operational procedures identical while scaling into cloud-native clusters.

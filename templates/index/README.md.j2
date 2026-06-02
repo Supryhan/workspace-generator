@@ -1,0 +1,22 @@
+# {{ workspace.display_name }} — Index
+
+Welcome to the **{{ workspace.display_name }}** index repository.
+
+This repository is the central documentation hub, repository catalog, and roadmap dashboard for the **{{ solution.display_name }}** workspace.
+
+## Workspace Repositories
+
+| Repository | Role | Local Path |
+| --- | --- | --- |
+| [index](./index) | Workspace Documentation & Blueprint Catalog | `index/` |
+| [infra](./infra) | Infrastructure, Docker Compose & Version Manifests | `infra/` |
+{% for component in components -%}
+| [{{ component.name }}](./{{ component.repository.path }}) | {{ component.kind | capitalize }}: {{ component.name }} ({{ component.language or "N/A" }}) | `{{ component.repository.path }}/` |
+{% endfor %}
+
+## Getting Started
+
+1. Review the workspace structure in [WORKSPACE-CARD.md](./WORKSPACE-CARD.md).
+2. Set up your local environment using the [Infrastructure Repository](../infra).
+3. Explore the full component catalog in [COMPONENTS.md](./COMPONENTS.md).
+4. Check active milestones in [ROADMAP.md](./ROADMAP.md).

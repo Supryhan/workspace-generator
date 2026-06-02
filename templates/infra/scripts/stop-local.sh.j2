@@ -1,0 +1,18 @@
+#!/bin/bash
+set -e
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+INFRA_DIR="$(dirname "$SCRIPT_DIR")"
+
+echo "Shutting down {{ workspace.display_name }} cluster..."
+
+cd "$INFRA_DIR"
+
+# Clean up override debug files if present
+if [ -f compose/compose.local.override.yml ]; then
+  rm compose/compose.local.override.yml
+fi
+
+docker compose -f compose/compose.local.yml --profile all down
+
+echo "Workspace stopped."

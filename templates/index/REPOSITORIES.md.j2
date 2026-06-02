@@ -1,0 +1,19 @@
+# Repository Catalog — {{ solution.display_name }}
+
+All git-ready repositories in the **{{ workspace.display_name }}** workspace:
+
+## Workspace Infrastructure
+
+- **`index/`** — Workspace catalog, blueprint snapshot, cross-repository documentation.
+- **`infra/`** — Docker Compose orchestration, version manifests, port-forwarding configs, local debug scripts.
+
+## Solution Repositories
+
+{% for component in components -%}
+### `{{ component.repository.path }}/`
+- **Name**: `{{ component.name }}`
+- **Kind**: `{{ component.kind }}`
+- **Remote**: `{{ component.repository.remote_name or "Not configured" }}`
+- **Stack**: {{ component.language or "N/A" }}{% if component.framework %} / {{ component.framework }}{% endif %}
+
+{% endfor %}

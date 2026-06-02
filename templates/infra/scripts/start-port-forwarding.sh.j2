@@ -1,0 +1,43 @@
+#!/bin/bash
+set -e
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+INFRA_DIR="$(dirname "$SCRIPT_DIR")"
+
+ENV_NAME="${1:-DEV}"
+allowed=("local" "DEV" "SIT" "UAT" "PROD")
+valid=false
+
+for env in "${allowed[@]}"; do
+  if [ "$ENV_NAME" = "$env" ]; then
+    valid=true
+  fi
+done
+
+if [ "$valid" = false ]; then
+  echo "Error: Invalid environment '$ENV_NAME'. Choose from: local, DEV, SIT, UAT, PROD"
+  exit 1
+fi
+
+cd "$INFRA_DIR"
+
+# Ensure the ignored runtime state directory exists
+RUNTIME_DIR=".runtime/port-forwarding"
+mkdir -p "$RUNTIME_DIR"
+
+echo "Initializing port-forwarding tunnels for environment: $ENV_NAME..."
+
+# In future versions, this reads port-forwarding/$ENV_NAME.yaml to execute kubectl/SSH commands.
+# For version 1, we generate mock running processes/PIDs to establish state structures.
+
+{% for component in components -%}
+{% if component.port -%}
+# Mock tunnel for {{ component.name }} on port {{ component.port }}
+# In real usage: kubectl port-forward svc/{{ component.name }} {{ component.port }}:{{ component.port }} & echo $! > $RUNTIME_DIR/{{ component.name }}.pid
+MOCK_PID=$((1000 + $RANDOM % 9000))
+echo "$MOCK_PID" > "$RUNTIME_DIR/{{ component.name }}.pid"
+echo "  [STARTED] {{ component.name }} (Local Port: {{ component.port }} -> Remote Service) with Mock PID $MOCK_PID"
+{% endif -%}
+{% endfor %}
+
+echo "Tunnels successfully initialized. State stored in $RUNTIME_DIR/"

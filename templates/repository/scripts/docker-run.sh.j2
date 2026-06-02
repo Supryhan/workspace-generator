@@ -1,0 +1,15 @@
+#!/bin/bash
+set -e
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+COMP_DIR="$(dirname "$SCRIPT_DIR")"
+
+echo "Launching Docker container for '{{ component.name }}'..."
+cd "$COMP_DIR"
+
+docker run -it --rm \
+  -e ENV=local \
+{%- if component.port %}
+  -p {{ component.port }}:{{ component.port }} \
+{%- endif %}
+  {{ workspace.name }}/{{ component.name }}:{{ component.version }}

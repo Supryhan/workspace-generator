@@ -1,0 +1,10 @@
+workspace: {{ workspace.name }}
+environment: {{ env_name }}
+
+components:
+{% for component in components %}
+  {{ component.name }}:
+    repository: {{ component.repository }}
+    version: {{ component.version }}
+    image: {{ workspace.name }}/{{ component.name }}:{{ component.version }}
+{% endfor %}

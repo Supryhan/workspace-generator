@@ -1,0 +1,18 @@
+#!/bin/bash
+set -e
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+INFRA_DIR="$(dirname "$SCRIPT_DIR")"
+
+cd "$INFRA_DIR"
+
+echo "Stopping workspace debugging mode..."
+
+if [ -f compose/compose.local.override.yml ]; then
+  docker compose -f compose/compose.local.yml -f compose/compose.local.override.yml --profile all down
+  rm compose/compose.local.override.yml
+else
+  docker compose -f compose/compose.local.yml --profile all down
+fi
+
+echo "Debug workspace shutdown completed."

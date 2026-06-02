@@ -1,0 +1,49 @@
+# {{ workspace.display_name }} — Infrastructure
+
+This repository coordinates local and remote environment orchestration, environment-specific configuration schemas, and compatibility validations for **{{ solution.display_name }}**.
+
+## Folder Layout
+
+- `compose/`: Docker Compose configurations per environment.
+- `env/`: Helper `.env.example` templates for secrets and variables.
+- `versions/`: **Canonical Version Manifests** (`local.yaml`, `DEV.yaml`, etc.) — the single source of truth for component versions.
+- `port-forwarding/`: Port forwarding configuration mappings per environment.
+- `scripts/`: Execution controls (startup, version checks, logs, local debug overrides).
+- `docs/`: Technical guides for deployments, version matrices, and local debugging.
+
+> **Note**: `.runtime/` is a transient runtime state directory. It is created automatically by `scripts/start-port-forwarding.sh` and is gitignored.
+
+## Local Quickstart
+
+1. Navigate to this directory:
+   ```bash
+   cd ~/DEVELOPER/workspaces/{{ workspace.name }}/infra
+   ```
+
+2. Start the local Docker Compose cluster:
+   ```bash
+   ./scripts/start-local.sh
+   ```
+
+3. View combined Docker logs:
+   ```bash
+   ./scripts/logs.sh
+   ```
+
+4. Run service health smoke-tests:
+   ```bash
+   ./scripts/smoke-test.sh
+   ```
+
+5. Stop the container cluster:
+   ```bash
+   ./scripts/stop-local.sh
+   ```
+
+## Local IDE Debug Workflow
+
+To debug a service in your IDE while keeping all dependencies containerized:
+```bash
+./scripts/start-with-local-component.sh <service-name>
+```
+This frees the target service's port for your IDE process while other containers communicate with it via `host.docker.internal:<port>`. See [docs/LOCAL-DEBUG.md](./docs/LOCAL-DEBUG.md) for details.

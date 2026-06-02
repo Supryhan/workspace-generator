@@ -1,0 +1,86 @@
+workspace:
+  name: student-management
+  display_name: Student Management Workspace
+  base_directory: ~/DEVELOPER/workspaces
+  github_owner: your-github-owner
+  default_visibility: private
+  repository_mode: starter
+
+solution:
+  name: student-management
+  display_name: Student Management System
+  domain: education
+
+environments:
+  - local
+  - DEV
+  - SIT
+  - UAT
+  - PROD
+
+repositories:
+  index:
+    enabled: true
+    path: index
+  infra:
+    enabled: true
+    path: infra
+
+components:
+  - name: students-service
+    kind: service
+    repository:
+      path: services/students-service
+      remote_name: student-management-students-service
+    language: scala
+    framework: http4s
+    database: postgres
+    port: 8081
+    version: 0.3.1
+
+  - name: courses-service
+    kind: service
+    repository:
+      path: services/courses-service
+      remote_name: student-management-courses-service
+    language: scala
+    framework: http4s
+    database: postgres
+    port: 8082
+    version: 0.2.4
+
+  - name: web-frontend
+    kind: app
+    repository:
+      path: apps/web-frontend
+      remote_name: student-management-web-frontend
+    language: typescript
+    framework: react
+    port: 5173
+    version: 0.5.0
+
+  - name: analytics-spark-job
+    kind: job
+    repository:
+      path: jobs/analytics-spark-job
+      remote_name: student-management-analytics-spark-job
+    language: scala
+    framework: apache-spark
+    # Omitting version to confirm Pydantic default of '0.1.0'
+
+  - name: kafka-events-connector
+    kind: connector
+    repository:
+      path: connectors/kafka-events-connector
+      remote_name: student-management-kafka-events-connector
+    language: scala
+    framework: kafka
+    version: 0.1.0
+
+  - name: shared-domain
+    kind: library
+    repository:
+      path: libraries/shared-domain
+      remote_name: student-management-shared-domain
+    language: scala
+    version: 0.1.0

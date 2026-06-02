@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+{% for component in components %}
+  # {{ component.kind | capitalize }}: {{ component.name }}
+  {{ component.name }}:
+    container_name: {{ workspace.name }}-{{ component.name }}
+    build:
+      context: ../{{ component.repository.path }}
+      dockerfile: Dockerfile
+{% if component.port %}
+    ports:
+      - "{{ component.port }}:{{ component.port }}"
+{% endif %}
+    profiles:
+      - {{ component.name }}
+      - all
+    environment:
+      - ENV=local
+      - PORT={{ component.port or "" }}
+{% if component.database != 'none' %}
+      - DB_HOST={{ component.name }}-db
+      - DB_PORT=5432
+      - DB_NAME={{ component.name }}_db
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+    depends_on:
+      - {{ component.name }}-db
+{% endif %}
+    networks:
+      - {{ workspace.name }}-network
+
+{% if component.database != 'none' %}
+  # Isolated database container for {{ component.name }}
+  {{ component.name }}-db:
+    container_name: {{ workspace.name }}-{{ component.name }}-db
+{% if component.database == 'postgres' %}
+    image: postgres:15-alpine
+{% else %}
+    image: {{ component.database }}:latest
+{% endif %}
+    environment:
+      - POSTGRES_DB={{ component.name }}_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    profiles:
+      - {{ component.name }}
+      - dbs
+      - all
+    networks:
+      - {{ workspace.name }}-network
+{% endif %}
+{% endfor %}
+
+networks:
+  {{ workspace.name }}-network:
+    name: {{ workspace.name }}-network
+    driver: bridge

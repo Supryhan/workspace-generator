@@ -1,0 +1,54 @@
+# {{ component.name }}
+
+This repository houses the **{{ component.name }}** component, which is a `{{ component.kind }}` built using the **{{ component.framework }}** framework in **{{ component.language }}**.
+
+---
+
+## Technical Specifications
+- **Technology Stack**: {{ component.language }} / {{ component.framework }}
+- **Default Local Port**: `{{ component.port or "N/A" }}`
+- **Database Owned**: `{{ component.database }}`
+- **Current Version**: `{{ component.version }}`
+
+---
+
+## Workspace Layout
+
+- `src/`: Core source files.
+- `tests/`: Unit and integration testing trees.
+- `docs/`: Technical documents.
+- `scripts/`: Execution and deployment runners.
+{% if component.database != 'none' -%}
+- `migrations/`: Database schema evolutions.
+{% endif %}
+
+## CLI Shell Controls
+
+Shell scripts are located in the `scripts/` directory:
+
+1. **Run Local Application**:
+   ```bash
+   ./scripts/run.sh
+   ```
+
+2. **Execute Tests**:
+   ```bash
+   ./scripts/test.sh
+   ```
+
+3. **Build Docker Image**:
+   ```bash
+   ./scripts/docker-build.sh
+   ```
+
+4. **Run Docker Image locally**:
+   ```bash
+   ./scripts/docker-run.sh
+   ```
+
+{% if component.database != 'none' -%}
+## Database Migrations
+This component owns an isolated **{{ component.database }}** database. To manage migrations:
+- Run migrations: `./scripts/migrate-up.sh`
+- View detailed guide in [docs/DATABASE.md](./docs/DATABASE.md).
+{% endif %}

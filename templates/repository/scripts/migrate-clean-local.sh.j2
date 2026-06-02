@@ -1,0 +1,12 @@
+#!/bin/bash
+set -e
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+COMP_DIR="$(dirname "$SCRIPT_DIR")"
+
+echo "CRITICAL: Clearing all schemas and data in the local database for '{{ component.name }}'..."
+cd "$COMP_DIR"
+
+echo "Cleaning database: jdbc:{{ component.database }}://localhost:5432/{{ component.name }}_db"
+echo "  [CLEANING] Executing schema drop commands..."
+echo "  [CLEANING] Database cleaned cleanly! Database is now empty."

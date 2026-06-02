@@ -1,0 +1,11 @@
+# Infrastructure Components - {{ workspace.display_name }}
+
+Active component register for **{{ workspace.display_name }}** orchestration:
+
+{% for component in components -%}
+- **{{ component.name }}**:
+  - Service Name: `{{ component.name }}`
+  - Repository Name: `{{ component.repository }}`
+  - Internal Mapped Port: `{{ component.port or "N/A" }}`
+  - Mapped Database Service: `{% if component.database != 'none' %}{{ component.name }}-db{% else %}None{% endif %}`
+{% endfor %}

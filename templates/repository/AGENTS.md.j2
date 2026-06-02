@@ -1,0 +1,15 @@
+# Agentic AI Workspace Guidelines - {{ component.name }}
+
+Welcome, Agent! This guide establishes technical directions for editing and maintaining this repository.
+
+## Repository Tech Stack
+- **Language**: `{{ component.language }}`
+- **Framework**: `{{ component.framework }}`
+- **Database**: `{{ component.database }}`
+
+## Task Checklist
+When implementing features or bug fixes:
+1. **Maintain version integrity**: Keep root `VERSION` updated matching semver targets.
+2. **Execute tests**: Run `./scripts/test.sh` before finalizing changes.
+3. **Database migrations**: If modifying models, ensure new migrations are appended inside `migrations/` and documented in `docs/DATABASE.md`.
+4. **Build confirmation**: Ensure `./scripts/docker-build.sh` passes without cache failures.

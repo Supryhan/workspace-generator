@@ -1,0 +1,39 @@
+# Workspace Version Management - {{ workspace.display_name }}
+
+This document outlines the canonical version management strategy for **{{ workspace.display_name }}**.
+
+---
+
+## Canonical Workspace Manifests
+
+All environment-specific compatibility specifications are organized as YAML manifests in the infra repository:
+- **`versions/local.yaml`**
+- **`versions/DEV.yaml`**
+- **`versions/SIT.yaml`**
+- **`versions/UAT.yaml`**
+- **`versions/PROD.yaml`**
+
+These files act as the **single source of truth** for component compatibility in any given environment.
+
+---
+
+## Component Version Ownership
+
+1. **Root-Level `VERSION`**: Every component repository contains a root-level **`VERSION`** text file declaring its Semantic Version (e.g., `0.3.1`).
+2. **Independence**: Each component is versioned independently, maintaining technology-independent version flags.
+
+---
+
+## Validation & Verification
+
+To verify that the expected versions in the workspace manifest align with what is actually cloned in your workspace, run the validation tool:
+
+```bash
+./scripts/validate-compatibility.sh SIT
+```
+
+This validation script:
+- Reads the environment manifest (`versions/SIT.yaml`).
+- Locates the local clone for each declared component.
+- Inspects the local `VERSION` file.
+- Raises an error if there is any mismatch or missing component repository.

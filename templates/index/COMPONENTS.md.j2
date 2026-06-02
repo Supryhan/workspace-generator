@@ -1,0 +1,29 @@
+# Component Catalog — {{ solution.display_name }}
+
+This document provides an architectural overview of all software components defined in the blueprint for **{{ workspace.display_name }}**.
+
+Components are grouped by functional role. The term *component* is used as a generic umbrella; each entry has a specific `kind` that determines its role and local folder group.
+
+## Terminology
+
+| Kind | Folder Group | Description |
+| --- | --- | --- |
+| `service` | `services/` | Backend service or microservice |
+| `app` | `apps/` | Standalone runnable application (frontend, admin portal, mobile) |
+| `job` | `jobs/` | Scheduled, batch, Spark, ETL, analytics, or background job |
+| `connector` | `connectors/` | Integration adapter for external systems, Kafka, APIs |
+| `library` | `libraries/` | Shared code library used by multiple repositories |
+
+## Component Register
+
+| Name | Kind | Tech Stack | Port | Database | Version | Local Path | Remote Name |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+{% for component in components -%}
+| **{{ component.name }}** | `{{ component.kind }}` | {{ component.language or "N/A" }}{% if component.framework %} / {{ component.framework }}{% endif %} | `{{ component.port or "N/A" }}` | `{{ component.database }}` | `{{ component.version }}` | `{{ component.repository.path }}/` | `{{ component.repository.remote_name or "N/A" }}` |
+{% endfor %}
+
+## Communication Topology
+
+- **Docker Compose Setup**: Containerized services communicate inside the Compose network (`infra/compose/compose.local.yml`).
+- **Local Debugging Override**: A service under active debugging uses `host.docker.internal:<port>` to connect from other containers to your local IDE process.
+- **Isolated Databases**: Each database-owning service gets its own isolated container (`<service-name>-db`).

@@ -1,0 +1,25 @@
+#!/bin/bash
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+INFRA_DIR="$(dirname "$SCRIPT_DIR")"
+
+cd "$INFRA_DIR"
+
+echo "=== Local Component Version Inventory ==="
+echo "Scanning workspace components..."
+
+{% for component in components -%}
+REPO_PATH="../{{ component.repository }}"
+VERSION_FILE="$REPO_PATH/VERSION"
+
+if [ -d "$REPO_PATH" ]; then
+  if [ -f "$VERSION_FILE" ]; then
+    VER=$(cat "$VERSION_FILE" | xargs)
+    echo "  - {{ component.name }}: version $VER"
+  else
+    echo "  - {{ component.name }}: version file missing (expected $VERSION_FILE)"
+  fi
+else
+  echo "  - {{ component.name }}: directory missing (expected $REPO_PATH)"
+fi
+{% endfor %}
+echo "========================================="

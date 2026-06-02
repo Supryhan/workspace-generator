@@ -1,0 +1,30 @@
+# Workspace Card: {{ workspace.display_name }}
+
+## Workspace Metadata
+- **Workspace Name**: `{{ workspace.name }}`
+- **Display Name**: {{ workspace.display_name }}
+- **GitHub Owner**: `{{ workspace.github_owner }}`
+- **Default Visibility**: `{{ workspace.default_visibility }}`
+- **Repository Mode**: `{{ workspace.repository_mode }}`
+
+## Solution Metadata
+- **Solution Name**: `{{ solution.name }}`
+- **Display Name**: {{ solution.display_name }}
+{% if solution.domain %}- **Domain**: `{{ solution.domain }}`{% endif %}
+
+## Active Environments
+{% for env in environments -%}
+- `{{ env }}`
+{% endfor %}
+
+## Repository Groups
+- **index/**: Workspace catalog, blueprint snapshot, and cross-repository documentation.
+- **infra/**: Docker Compose orchestration, version manifests, port-forwarding, and scripts.
+{% for component in components -%}
+- **{{ component.repository.path }}/**: {{ component.kind | capitalize }} — `{{ component.name }}`.
+{% endfor %}
+
+## Infrastructure
+- Local Orchestration: Docker Compose (`infra/compose/`)
+- Canonical Versions: `infra/versions/`
+- Port Forwarding Configs: `infra/port-forwarding/`

@@ -1,0 +1,15 @@
+workspace: {{ workspace.name }}
+environment: {{ env_name }}
+
+# Port Forwarding Tunnel Definitions
+# Use this configuration map to organize Tailscale tunnels, VPN targets, 
+# or Kubernetes kubectl port-forward setups.
+forwards:
+{% for component in components %}
+{% if component.port %}
+  - name: {{ component.name }}
+    local_port: {{ component.port }}
+    remote_service: {{ component.name }}.default.svc.cluster.local
+    remote_port: {{ component.port }}
+{% endif %}
+{% endfor %}

@@ -1,0 +1,18 @@
+#!/bin/bash
+set -e
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+INFRA_DIR="$(dirname "$SCRIPT_DIR")"
+
+echo "Resetting local {{ workspace.display_name }} cluster (removing all volumes)..."
+
+cd "$INFRA_DIR"
+
+if [ -f compose/compose.local.override.yml ]; then
+  rm compose/compose.local.override.yml
+fi
+
+docker compose -f compose/compose.local.yml --profile all down -v --remove-orphans
+docker compose -f compose/compose.local.yml --profile all up -d
+
+echo "Reset complete. All services launched cleanly."

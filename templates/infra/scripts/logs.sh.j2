@@ -1,0 +1,8 @@
+#!/bin/bash
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+INFRA_DIR="$(dirname "$SCRIPT_DIR")"
+
+cd "$INFRA_DIR"
+
+echo "Streaming logs for all running components (Ctrl+C to exit)..."
+docker compose -f compose/compose.local.yml --profile all logs -f --tail=100

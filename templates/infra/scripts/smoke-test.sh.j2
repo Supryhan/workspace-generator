@@ -1,0 +1,29 @@
+#!/bin/bash
+
+echo "Running {{ workspace.display_name }} smoke-test..."
+FAILED=0
+
+{% for component in components -%}
+{% if component.port -%}
+echo -n "Checking component '{{ component.name }}' on port {{ component.port }}... "
+if curl -s -f --connect-timeout 2 http://localhost:{{ component.port }}/ > /dev/null; then
+  echo "✅ OK"
+else
+  # Try basic ping check since health check path might not match root /
+  if curl -s -I --connect-timeout 2 http://localhost:{{ component.port }}/ &> /dev/null; then
+    echo "✅ OK (Status Response Received)"
+  else
+    echo "❌ FAILED"
+    FAILED=$((FAILED + 1))
+  fi
+fi
+{% endif -%}
+{% endfor %}
+
+if [ $FAILED -eq 0 ]; then
+  echo "Smoke tests completed successfully! All components reachable."
+  exit 0
+else
+  echo "Smoke test finished with $FAILED failure(s)."
+  exit 1
+fi

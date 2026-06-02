@@ -1,0 +1,28 @@
+# Database Architecture - {{ component.name }}
+
+This component owns and operates an isolated **{{ component.database }}** database.
+
+---
+
+## Connection Settings
+
+For the local docker compose environment:
+- **Database Engine**: `{{ component.database }}`
+- **Database Host**: `{{ component.name }}-db` (within Compose bridge)
+- **Database Name**: `{{ component.name }}_db`
+- **Port**: `5432`
+- **Username**: `postgres`
+- **Password**: `postgres`
+
+For the local development machine host:
+- Connect to database via container port forwards on localhost on standard mapping parameters.
+
+---
+
+## Evolution Guides
+
+Schema evolution is governed by scripts stored in the `migrations/` directory.
+
+- To run migrations: `./scripts/migrate-up.sh`
+- To review active migrations: `./scripts/migrate-info.sh`
+- To drop local tables cleanly: `./scripts/migrate-clean-local.sh`

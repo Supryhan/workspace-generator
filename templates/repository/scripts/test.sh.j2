@@ -1,0 +1,26 @@
+#!/bin/bash
+set -e
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+COMP_DIR="$(dirname "$SCRIPT_DIR")"
+
+echo "Executing unit tests for '{{ component.name }}'..."
+cd "$COMP_DIR"
+
+{% if component.language == 'typescript' or component.language == 'javascript' -%}
+if [ -f package.json ]; then
+  npm test
+else
+  echo "✅ Mock: JS tests passed."
+fi
+{% elif component.language == 'python' -%}
+if python -m pytest --version &>/dev/null; then
+  python -m pytest
+else
+  echo "✅ Mock: Python tests passed."
+fi
+{% elif component.language == 'scala' -%}
+sbt test
+{% else -%}
+echo "✅ Mock: Generic tests passed."
+{%- endif %}

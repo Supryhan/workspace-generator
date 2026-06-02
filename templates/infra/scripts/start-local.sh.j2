@@ -1,0 +1,16 @@
+#!/bin/bash
+set -e
+
+# Resolve script directory path
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+INFRA_DIR="$(dirname "$SCRIPT_DIR")"
+
+echo "Starting local {{ workspace.display_name }} cluster..."
+
+# Run from infra repository root
+cd "$INFRA_DIR"
+
+# Spin up all services using Compose and profiles
+docker compose -f compose/compose.local.yml --profile all up -d
+
+echo "Services launched successfully! Run ./scripts/logs.sh to watch startup logs."

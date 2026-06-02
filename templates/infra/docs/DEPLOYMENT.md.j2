@@ -1,0 +1,9 @@
+# Workspace Deployment Guide - {{ workspace.display_name }}
+
+Instructions for deploying **{{ workspace.display_name }}**:
+
+1. **Local Deployment**:
+   Utilize Docker Compose structures under `compose/compose.local.yml`. Run `./scripts/start-local.sh`.
+
+2. **Cloud/Remote Deployments**:
+   Ensure Docker images are built and pushed using component CI pipelines. Update environment manifests inside `versions/` and execute target deploy commands.

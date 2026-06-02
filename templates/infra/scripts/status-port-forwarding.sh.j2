@@ -1,0 +1,23 @@
+#!/bin/bash
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+INFRA_DIR="$(dirname "$SCRIPT_DIR")"
+
+cd "$INFRA_DIR"
+
+RUNTIME_DIR=".runtime/port-forwarding"
+
+echo "=== Port-Forwarding Status Register ==="
+
+if [ ! -d "$RUNTIME_DIR" ] || [ -z "$(ls -A "$RUNTIME_DIR" 2>/dev/null)" ]; then
+  echo "Status: No active forwarding tunnels are running."
+  exit 0
+fi
+
+for pid_file in "$RUNTIME_DIR"/*.pid; do
+  if [ -f "$pid_file" ]; then
+    PID=$(cat "$pid_file")
+    COMP_NAME=$(basename "$pid_file" .pid)
+    echo "🟢 Component '$COMP_NAME' is active (PID: $PID)"
+  fi
+done
+echo "======================================"

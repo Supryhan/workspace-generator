@@ -1,0 +1,21 @@
+# Workspace Status — {{ solution.display_name }}
+
+Latest environment health for **{{ workspace.display_name }}**:
+
+## Health Status
+
+| Environment | Status | Verification |
+| --- | --- | --- |
+| **local** | 🟡 PENDING | Run `infra/scripts/smoke-test.sh` |
+| **DEV** | ⚪ UNKNOWN | Port configurations pending |
+| **SIT** | ⚪ UNKNOWN | Version validation pending |
+| **UAT** | ⚪ UNKNOWN | — |
+| **PROD** | ⚪ UNKNOWN | — |
+
+## Workspace Integrity Check
+
+Ensure all local versions align with canonical manifests:
+```bash
+cd infra
+./scripts/validate-compatibility.sh
+```

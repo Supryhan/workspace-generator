@@ -1,0 +1,54 @@
+{% if component.language == 'typescript' or component.language == 'javascript' -%}
+# Multi-stage build for Node.js / TypeScript
+FROM node:18-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --silent
+COPY . .
+RUN npm run build --if-present
+
+FROM node:18-alpine
+WORKDIR /app
+COPY --from=builder /app ./
+ENV PORT={{ component.port or 3000 }}
+EXPOSE {{ component.port or 3000 }}
+CMD ["npm", "start"]
+
+{% elif component.language == 'python' -%}
+# Build stage for Python FastAPI / ML
+FROM python:3.10-slim AS builder
+WORKDIR /app
+COPY requirements.txt* pyproject.toml* ./
+RUN pip install --no-cache-dir --user -r requirements.txt || pip install --no-cache-dir --user . || true
+
+FROM python:3.10-slim
+WORKDIR /app
+COPY --from=builder /root/.local /root/.local
+COPY . .
+ENV PATH=/root/.local/bin:$PATH
+ENV PORT={{ component.port or 8000 }}
+EXPOSE {{ component.port or 8000 }}
+CMD ["python", "src/main.py"]
+
+{% elif component.language == 'scala' -%}
+# Build stage for Scala / sbt / Spark
+FROM sbttool/sbt:1.9.0 AS builder
+WORKDIR /app
+COPY . .
+RUN sbt assembly || sbt compile || true
+
+FROM openjdk:17-slim
+WORKDIR /app
+COPY --from=builder /app/target/scala-*/*.jar ./app.jar || true
+ENV PORT={{ component.port or 8080 }}
+EXPOSE {{ component.port or 8080 }}
+ENTRYPOINT ["java", "-jar", "app.jar"]
+
+{% else -%}
+# Fallback builder for empty/integration components
+FROM alpine:latest
+RUN apk add --no-cache bash curl
+WORKDIR /app
+COPY . .
+CMD ["/bin/bash", "scripts/run.sh"]
+{%- endif %}

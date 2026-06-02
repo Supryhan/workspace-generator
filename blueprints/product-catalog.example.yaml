@@ -1,0 +1,52 @@
+workspace:
+  name: product-catalog
+  display_name: Product Catalog Workspace
+  base_directory: ~/DEVELOPER/workspaces
+  github_owner: your-github-owner
+
+solution:
+  name: product-catalog
+  display_name: Product Catalog System
+  domain: demo
+
+environments:
+  - local
+  - DEV
+  - SIT
+  - UAT
+  - PROD
+
+repositories:
+  index:
+    enabled: true
+    path: index
+  infra:
+    enabled: true
+    path: infra
+
+repository_mode: starter
+default_visibility: private
+
+components:
+  - name: catalog-service
+    kind: service
+    language: scala
+    framework: http4s
+    database: postgres
+    internal_port: 8080
+    external_port: 8080
+    version: 0.1.0
+    repository:
+      path: services/catalog-service
+      remote_name: product-catalog-catalog-service
+
+  - name: web-frontend
+    kind: app
+    language: typescript
+    framework: react
+    database: none
+    internal_port: 5173
+    external_port: 5173
+    version: 0.1.0
+    repository:
+      path: apps/web-frontend

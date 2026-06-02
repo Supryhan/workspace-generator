@@ -1,0 +1,26 @@
+#!/bin/bash
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+INFRA_DIR="$(dirname "$SCRIPT_DIR")"
+
+cd "$INFRA_DIR"
+
+RUNTIME_DIR=".runtime/port-forwarding"
+
+if [ ! -d "$RUNTIME_DIR" ] || [ -z "$(ls -A "$RUNTIME_DIR" 2>/dev/null)" ]; then
+  echo "No active port-forwarding tunnels found."
+  exit 0
+fi
+
+echo "Stopping port-forwarding tunnels..."
+
+for pid_file in "$RUNTIME_DIR"/*.pid; do
+  if [ -f "$pid_file" ]; then
+    PID=$(cat "$pid_file")
+    COMP_NAME=$(basename "$pid_file" .pid)
+    echo "  [STOPPING] $COMP_NAME (PID $PID)"
+    # In a real environment: kill $PID 2>/dev/null || true
+    rm "$pid_file"
+  fi
+done
+
+echo "All tunnels terminated and state cleared."

@@ -1,0 +1,12 @@
+#!/bin/bash
+set -e
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+COMP_DIR="$(dirname "$SCRIPT_DIR")"
+
+echo "Building Docker image for '{{ component.name }}'..."
+cd "$COMP_DIR"
+
+docker build -t {{ workspace.name }}/{{ component.name }}:{{ component.version }} .
+
+echo "Docker image built successfully: {{ workspace.name }}/{{ component.name }}:{{ component.version }}"

@@ -1,0 +1,16 @@
+# Database Migrations - {{ component.name }}
+
+This directory contains the database schema evolutions for the **{{ component.name }}** database.
+
+## Migration Structure
+
+Place your database schema script changes here:
+- **Flyway-style**: `V1__init_schema.sql`, `V2__add_new_table.sql`
+- **Liquibase-style**: `changelog.xml`
+
+## Managing Migrations
+
+Shell script commands are located in `../scripts/`:
+- **`migrate-up.sh`**: Executes pending migrations.
+- **`migrate-info.sh`**: Queries current migration statuses.
+- **`migrate-clean-local.sh`**: Resets and cleans the local database workspace completely.

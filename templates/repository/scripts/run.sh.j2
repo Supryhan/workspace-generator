@@ -1,0 +1,29 @@
+#!/bin/bash
+set -e
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+COMP_DIR="$(dirname "$SCRIPT_DIR")"
+
+echo "Starting component '{{ component.name }}' locally..."
+cd "$COMP_DIR"
+
+{% if component.language == 'typescript' or component.language == 'javascript' -%}
+if [ -f package.json ]; then
+  npm install
+  npm start
+else
+  echo "Mock: Starting javascript/typescript app..."
+fi
+{% elif component.language == 'python' -%}
+if [ -f requirements.txt ]; then
+  pip install -r requirements.txt
+fi
+python src/main.py
+{% elif component.language == 'scala' -%}
+sbt run
+{% else -%}
+echo "Running generic empty component: {{ component.name }}"
+echo "Listening on port: {{ component.port or 'N/A' }}"
+# Keep script alive in mock mode
+while true; do sleep 1000; done
+{%- endif %}

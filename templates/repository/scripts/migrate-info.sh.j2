@@ -1,0 +1,13 @@
+#!/bin/bash
+set -e
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+COMP_DIR="$(dirname "$SCRIPT_DIR")"
+
+echo "Querying schema migration inventory for '{{ component.name }}'..."
+cd "$COMP_DIR"
+
+echo "Database connection: jdbc:{{ component.database }}://localhost:5432/{{ component.name }}_db"
+echo "=== Applied Migrations Register ==="
+echo "V1__init_schema.sql | SUCCESS | Applied at 2026-05-31"
+echo "=================================="

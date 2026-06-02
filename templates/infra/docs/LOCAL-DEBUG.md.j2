@@ -1,0 +1,41 @@
+# Local Debugging Guide - {{ workspace.display_name }}
+
+This guide explains how to debug a single component locally in your IDE while running the rest of the **{{ workspace.display_name }}** workspace dependencies in Docker Compose.
+
+---
+
+## The Workflow Scenario
+
+1. **Workspace Dependencies in Docker**: All services, message brokers, databases, and dependencies run in Docker Compose.
+2. **Local Debug Process**: You run the target service (e.g., `students-service`) locally in your IDE (IntelliJ, VS Code, PyCharm) in debug mode.
+3. **Seamless Communication**:
+   - The containerized components communicate with your IDE service via **`host.docker.internal:<port>`** (on macOS Docker Desktop, this maps directly to your host machine).
+   - Your IDE service communicates with containerized databases or brokers via `localhost:<docker-mapped-port>` or by routing to internal container ports.
+
+---
+
+## Step-by-Step Instructions
+
+### Step 1: Start the dependencies in scaled-down mode
+To run the workspace with the targeted service scaled off, run:
+```bash
+./scripts/start-with-local-component.sh <component-name>
+```
+Example:
+```bash
+./scripts/start-with-local-component.sh students-service
+```
+This generates a temporary `compose/compose.local.override.yml` setting `scale: 0` for `students-service`, freeing port bindings on your host machine while launching the PostgreSQL database container `students-service-db` in Docker.
+
+### Step 2: Spin up your IDE debugger
+Open your IDE in the component repository `../services/students-service/`.
+- Configure the application to bind to port (e.g. `8081`).
+- Configure connection strings to databases (e.g. `localhost:5432` or similar mapped database port).
+- Spin up the debugger!
+
+### Step 3: Stop Debug Session
+When finished, stop the IDE service and shut down Docker dependencies cleanly:
+```bash
+./scripts/stop-with-local-component.sh
+```
+This shuts down container resources and safely deletes the temporary `compose.local.override.yml`.
