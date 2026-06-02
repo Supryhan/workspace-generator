@@ -2,6 +2,7 @@ from pathlib import Path
 from workspace_generator.config import load_config
 from workspace_generator.models import BlueprintConfig, ComponentConfig
 from workspace_generator.renderer import TemplateRenderer
+from workspace_generator.preview import generate_preview_tree
 from workspace_generator.filesystem import (
     resolve_path,
     safe_mkdir,
@@ -63,6 +64,10 @@ class WorkspaceGenerator:
         print(f"Generating workspace '{config.workspace.display_name}' under: {workspace_dir}")
         print(f"Solution: '{solution.display_name}'")
         print(f"Safety Mode: '{self.safety_mode}' | Repository Mode: '{config.workspace.repository_mode}'")
+
+        # Print planned workspace tree preview
+        print()
+        print(generate_preview_tree(config, workspace_dir), end="")
 
         # Check top-level conflict
         if workspace_dir.exists() and self.safety_mode == "fail-if-exists":
